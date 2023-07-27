@@ -18,22 +18,38 @@ class A{
         return true;
     }
 };
-
-TEST(TestFixtureTestSuite,OperationTrueTest){
-    //Arrange
-    C cObj;
-    B bObj(&cObj);
-    A obj(&bObj);
-    //Act and Assert
-    ASSERT_TRUE(obj.operation());
+//Fixture Class
+class TestFixtureTestSuite:public testing::Test{
+protected:
+A*  aPtr;
+B* bPtr;
+C* cPtr; 
+TestFixtureTestSuite(){
+    //initializtion
 }
-TEST(TestFixtureTestSuite,OperationFalseTest){
+~TestFixtureTestSuite(){
+    //Releasing the Resources
+}
+void SetUp(){
     //Arrange
-    C cObj;
-    B bObj(&cObj);
-    A obj(&bObj);
+    this->cPtr=new C();
+    this->bPtr=new B(cPtr);
+    this->aPtr=new A(bPtr); 
+ }
+void TearDown(){
+    //delete resources
+    delete cPtr;
+    delete bPtr;
+    delete aPtr;
+}
+};
+
+TEST_F(TestFixtureTestSuite,OperationTrueTest){
+   
     //Act and Assert
-    ASSERT_FALSE(obj.operation());
-
-
+    ASSERT_TRUE(aPtr->operation());
+}
+TEST_F(TestFixtureTestSuite,OperationFalseTest){
+    //Act and Assert
+    ASSERT_FALSE(aPtr->operation());
 }
