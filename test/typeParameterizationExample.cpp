@@ -13,10 +13,6 @@ class ModelBTempSensor:public ITempSensor{
     public:
     int getOutSideTemp(){ return  23;}
 };
-class ModelCTempSensor:public ITempSensor{
-    public:
-    int getOutSideTemp(){ return  23;}
-};
 class AutoTempRegulator{
     ITempSensor* tempSensorPtr;
     public:
@@ -32,8 +28,6 @@ template <>
 ITempSensor* createObject<ModelATempSensor>() { return new ModelATempSensor(); }
 template <>
 ITempSensor* createObject<ModelBTempSensor>() { return new ModelBTempSensor(); }
-template <>
-ITempSensor* createObject<ModelCTempSensor>() { return new ModelCTempSensor(); }
 
 template <typename T>
 class TempSensorFixture:public testing::Test{
@@ -44,12 +38,24 @@ class TempSensorFixture:public testing::Test{
 
 };
 
-typedef Types<ModelATempSensor,ModelBTempSensor,ModelCTempSensor> Implementations;
-
-
+typedef Types<ModelATempSensor,ModelBTempSensor> Implementations;
 
 TYPED_TEST_SUITE(TempSensorFixture, Implementations);
 
 TYPED_TEST(TempSensorFixture,GetTempTest){
     ASSERT_EQ(this->objUnderTest->getOutSideTemp(),23);
+}
+
+class FakeTempSensor:public ITempSensor{
+    public:
+     public:
+    int getOutSideTemp(){ return  0;}
+
+}
+
+TEST(AutoTempRegulatorTestSuite,RegulateTempTest){
+    FakeTempSensor stub;
+    AutoTempRegulator codeUnderTest(&stub);
+    codeUnderTest.regulateTemp();
+    
 }
